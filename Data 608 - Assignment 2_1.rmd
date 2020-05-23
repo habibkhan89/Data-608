@@ -1,0 +1,75 @@
+---
+title: "Data 608 - Assignment 2"
+author: "Habib Khan"
+date: "February 23, 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Libraries
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(ggthemes)
+library(kableExtra)
+library(knitr)
+library(dplyr)
+library(grid)
+library(gridExtra)
+```
+
+
+# Overview of Assignment
+
+For module 2 we'll be looking at techniques for dealing with big data. In particular binning strategies and the datashader library (which possibly proves we'll never need to bin large data for visualization ever again.)
+To demonstrate these concepts we'll be looking at the PLUTO dataset put out by New York City's department of city planning. PLUTO contains data about every tax lot in New York City.
+PLUTO data can be downloaded from here. Unzip them to the same directory as this notebook, and you should be able to read them in using this (or very similar) code. Also take note of the data dictionary, it'll come in handy for this assignment.
+
+# Getting and loading the data
+
+```{r, eval=FALSE}
+# url & file
+base_url <- 'http://www1.nyc.gov/assets/planning/download/zip/data-maps/open-data/'
+zip_file <- 'nyc_pluto_16v2%20.zip'
+
+# download data 
+download.file(paste0(base_url,zip_file),zip_file)
+
+# unzip files
+unzip(zip_file)
+
+# subdirectory where unzipped file is stored
+sub_dir <- 'BORO_zip_files_csv/'
+
+# filename prefixes, each abbreviated to represent nyc boro
+file_prefix <- c('BX','BK','MN','QN','SI')
+
+# read csv data for each boro  
+for (i in 1:length(file_prefix)) {
+  
+  # construct string: filepath, filename
+  file_name <- paste0(sub_dir,file_prefix[i],".csv")
+  
+  # save each csv file as separate data frame
+  assign(file_prefix[i],read.csv(file_name, stringsAsFactors = FALSE))
+}
+
+# save to master dataframe 
+mydf <- rbind(BX, BK, MN, QN, SI)
+
+# write master csv
+write.csv(mydf, file="all_PLUTO_data.csv")
+```
+
+# Loading data from local directory
+
+```{r}
+data <- read.csv("all_PLUTO_data.csv", stringsAsFactors = FALSE)
+
+kable(head(data)) %>% kable_styling()
+```
+
